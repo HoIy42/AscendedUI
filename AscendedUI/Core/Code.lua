@@ -671,10 +671,10 @@ end
 -- This is the data we pass on to the ElvUI Plugin Installer.
 -- The Plugin Installer is reponsible for displaying the install guide for this layout.
 local InstallerData = {
-	Title = format("|cff4beb2c%s %s|r", "Ascended UI", "Installation"),
+	Title = format("|cff4beb2c%s %s|r", "AscendedUI", "Installation"),
 	Name = MyPluginName,
 	-- Uncomment the line below f you have a logo you want to use, otherwise it uses the one from ElvUI
-	-- tutorialImage = "Interface\\AddOns\\MyAddOn\\logo.tga",
+	tutorialImage = "Interface\\AddOns\\AscemdedUI\\Media\\logo.png",
 	Pages = {
 		[1] = function()
 			PluginInstallFrame.SubTitle:SetFormattedText("Welcome to the installation for %s.", MyPluginName)
