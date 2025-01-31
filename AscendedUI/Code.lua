@@ -5,11 +5,11 @@ local ReloadUI = ReloadUI
 local StopMusic = StopMusic
 local GetAddOnMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
 
--- Don't worry about this
+-- Gets version
 local addon, ns = ...
 local Version = GetAddOnMetadata(addon, "Version")
 
--- Change this line and use a unique name for your plugin.
+-- Plugins Name Goes Here
 local MyPluginName = "Ascended UI"
 
 -- Create references to ElvUI internals
@@ -18,15 +18,110 @@ local E, L, V, P, G = unpack(ElvUI)
 -- Create reference to LibElvUIPlugin
 local EP = LibStub("LibElvUIPlugin-1.0")
 
+-- Paste the Settings here
+local ACR = LibStub("AceConfigRegistry-3.0")
+local ACD = LibStub("AceConfigDialog-3.0")
+
+-- Initialize database
+ns.db = LibStub("AceDB-3.0"):New("AscendedUI", {
+    profile = {
+        addons = {
+            ['*'] = true, -- Default all addons to enabled
+            -- Add specific addon overrides here if needed
+        },
+        -- Add other settings here
+    },
+})
+
+-- Options table
+function ns:GetOptions()
+    local options = {
+        name = addon,
+        type = "group",
+        childGroups = "tab",
+        args = {
+            header = {
+                order = 1,
+                type = "header",
+                name = "AscendedUI",
+            },
+            general = {
+                order = 2,
+                type = "group",
+                name = "General",
+                args = {
+                    description = {
+                        order = 1,
+                        type = "description",
+                        name = "Configure your addon installation preferences",
+                    },
+                    selectAll = {
+                        order = 2,
+                        type = "execute",
+                        name = "Select All",
+                        func = function()
+                            for addon in pairs(ns.db.profile.addons) do
+                                ns.db.profile.addons[addon] = true
+                            end
+                            ACR:NotifyChange(addon)
+                        end,
+                    },
+                    deselectAll = {
+                        order = 3,
+                        type = "execute",
+                        name = "Deselect All",
+                        func = function()
+                            for addon in pairs(ns.db.profile.addons) do
+                                ns.db.profile.addons[addon] = false
+                            end
+                            ACR:NotifyChange(addon)
+                        end,
+                    },
+                },
+            },
+            addons = {
+                order = 3,
+                type = "group",
+                name = "Addons",
+                childGroups = "tree",
+                args = {
+                    -- This will be populated dynamically with your addons
+                },
+            },
+        },
+    }
+
+    -- Add your addons dynamically
+    for addonName, _ in pairs(ns.db.profile.addons) do
+        options.args.addons.args[addonName] = {
+            order = 1,
+            type = "toggle",
+            name = addonName,
+            get = function() return ns.db.profile.addons[addonName] end,
+            set = function(_, value) ns.db.profile.addons[addonName] = value end,
+        }
+    end
+
+    return options
+end
+
+-- Register with Blizzard Addon Menu
+local blizzardOptions = {
+    name = "My Addon Installer",
+    handler = ns,
+    type = "group",
+    args = ns:GetOptions().args
+}
+
+LibStub("AceConfig-3.0"):RegisterOptionsTable(addon, ns:GetOptions())
+LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addon, "My Addon Installer")
+
 -- Create a new ElvUI module so ElvUI can handle initialization when ready
 local mod = E:NewModule(MyPluginName, "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0");
 
 -- This function will hold your layout settings
 local function SetupLayout(layout)
-
-	-- PUT YOUR EXPORTED PROFILE/SETTINGS BELOW HERE
-
-	-- LAYOUT GOES HERE
+    -- Your layout settings here
 E.db["actionbar"]["bar1"]["backdrop"] = true
 E.db["actionbar"]["bar1"]["backdropSpacing"] = 1
 E.db["actionbar"]["bar1"]["buttonHeight"] = 36
@@ -636,145 +731,132 @@ E.private["general"]["worldMap"] = false
 E.private["install_complete"] = 13.7
 E.private["skins"]["parchmentRemoverEnable"] = true
 
-		-- If you want to modify the base layout according to
-		-- certain conditions then this is how you could do it
-		if layout == "tank" then
-			-- Make some changes to the layout posted above
-		elseif layout == "dps" then
-			-- Make some other changes
-		elseif layout == "healer" then
-			-- Make some different changes
-		end
+    -- Update ElvUI
+    E:StaggeredUpdateAll()
 
-	-- This section at the bottom is just to update ElvUI and display a message
-
-	-- Update ElvUI
-	E:StaggeredUpdateAll()
-
-	-- Show message about layout being set
-	PluginInstallStepComplete.message = "Layout Set"
-	PluginInstallStepComplete:Show()
+    -- Show message about layout being set
+    PluginInstallStepComplete.message = "Layout Set"
+    PluginInstallStepComplete:Show()
 end
 
 -- This function is executed when you press "Skip Process" or "Finished" in the installer.
 local function InstallComplete()
-	if GetCVarBool("Sound_EnableMusic") then
-		StopMusic()
-	end
+    if GetCVarBool("Sound_EnableMusic") then
+        StopMusic()
+    end
 
-	-- Set a variable tracking the version of the addon when layout was installed
-	E.db[MyPluginName].install_version = Version
+    -- Set a variable tracking the version of the addon when layout was installed
+    E.db[MyPluginName].install_version = Version
 
-	ReloadUI()
+    ReloadUI()
 end
 
 -- This is the data we pass on to the ElvUI Plugin Installer.
--- The Plugin Installer is reponsible for displaying the install guide for this layout.
 local InstallerData = {
-	Title = format("|cff4beb2c%s %s|r", "AscendedUI", "Installation"),
-	Name = MyPluginName,
-	-- Uncomment the line below f you have a logo you want to use, otherwise it uses the one from ElvUI
-	tutorialImage = "Interface\\AddOns\\AscendedUI\\logo.png",
-	tutorialImageSize = {158, 128},
-	tutorialImagePoint = {0, 17},
-	Pages = {
-		[1] = function()
-			PluginInstallFrame.SubTitle:SetFormattedText("Welcome to the installation for %s.", MyPluginName)
-			PluginInstallFrame.Desc1:SetText("This installation process will guide you through a few steps and apply settings to your current ElvUI profile. If you want to be able to go back to your original settings then create a new profile before going through this installation process.")
-			PluginInstallFrame.Desc2:SetText("Please press the continue button if you wish to go through the installation process, otherwise click the 'Skip Process' button.")
-			PluginInstallFrame.Option1:Show()
-			PluginInstallFrame.Option1:SetScript("OnClick", InstallComplete)
-			PluginInstallFrame.Option1:SetText("Skip Process")
-		end,
-		[2] = function()
-			PluginInstallFrame.SubTitle:SetText("Layouts")
-			PluginInstallFrame.Desc1:SetText("These are the layouts that are available. Please click a button below to apply the layout of your choosing.")
-			PluginInstallFrame.Desc2:SetText("Importance: |cff07D400High|r")
-			PluginInstallFrame.Option1:Show()
-			PluginInstallFrame.Option1:SetScript("OnClick", function() SetupLayout("tank") end)
-			PluginInstallFrame.Option1:SetText("AscendedUI Basic")
-		end,
-		[3] = function()
-			PluginInstallFrame.SubTitle:SetText("Installation Complete")
-			PluginInstallFrame.Desc1:SetText("You have completed the installation process.")
-			PluginInstallFrame.Desc2:SetText("Please click the button below in order to finalize the process and automatically reload your UI.")
-			PluginInstallFrame.Option1:Show()
-			PluginInstallFrame.Option1:SetScript("OnClick", InstallComplete)
-			PluginInstallFrame.Option1:SetText("Finished")
-		end,
-	},
-	StepTitles = {
-		[1] = "Welcome",
-		[2] = "Layouts",
-		[3] = "Installation Complete",
-	},
-	StepTitlesColor = {1, 1, 1},
-	StepTitlesColorSelected = {0, 179/255, 1},
-	StepTitleWidth = 200,
-	StepTitleButtonWidth = 180,
-	StepTitleTextJustification = "RIGHT",
+    Title = format("|cff4beb2c%s %s|r", "AscendedUI", "Installation"),
+    Name = MyPluginName,
+    tutorialImage = "Interface\\AddOns\\AscendedUI\\logo.png",
+    tutorialImageSize = {158, 128},
+    tutorialImagePoint = {0, 17},
+    Pages = {
+        [1] = function()
+            PluginInstallFrame.SubTitle:SetFormattedText("Welcome to the installation for %s.", MyPluginName)
+            PluginInstallFrame.Desc1:SetText("This installation process will guide you through a few steps and apply settings to your current ElvUI profile. If you want to be able to go back to your original settings then create a new profile before going through this installation process.")
+            PluginInstallFrame.Desc2:SetText("Please press the continue button if you wish to go through the installation process, otherwise click the 'Skip Process' button.")
+            PluginInstallFrame.Option1:Show()
+            PluginInstallFrame.Option1:SetScript("OnClick", InstallComplete)
+            PluginInstallFrame.Option1:SetText("Skip Process")
+        end,
+        [2] = function()
+            PluginInstallFrame.SubTitle:SetText("Layouts")
+            PluginInstallFrame.Desc1:SetText("These are the layouts that are available. Please click a button below to apply the layout of your choosing.")
+            PluginInstallFrame.Desc2:SetText("Importance: |cff07D400High|r")
+            PluginInstallFrame.Option1:Show()
+            PluginInstallFrame.Option1:SetScript("OnClick", function() SetupLayout("tank") end)
+            PluginInstallFrame.Option1:SetText("AscendedUI Basic")
+        end,
+        [3] = function()
+            PluginInstallFrame.SubTitle:SetText("Installation Complete")
+            PluginInstallFrame.Desc1:SetText("You have completed the installation process.")
+            PluginInstallFrame.Desc2:SetText("Please click the button below in order to finalize the process and automatically reload your UI.")
+            PluginInstallFrame.Option1:Show()
+            PluginInstallFrame.Option1:SetScript("OnClick", InstallComplete)
+            PluginInstallFrame.Option1:SetText("Finished")
+        end,
+    },
+    StepTitles = {
+        [1] = "Welcome",
+        [2] = "Layouts",
+        [3] = "Installation Complete",
+    },
+    StepTitlesColor = {1, 1, 1},
+    StepTitlesColorSelected = {0, 179/255, 1},
+    StepTitleWidth = 200,
+    StepTitleButtonWidth = 180,
+    StepTitleTextJustification = "RIGHT",
 }
 
 -- This function holds the options table which will be inserted into the ElvUI config
 local function InsertOptions()
-	E.Options.args.MyPluginName = {
-		order = 100,
-		type = "group",
-		name = format("|cff4beb2c%s|r", MyPluginName),
-		args = {
-			header1 = {
-				order = 1,
-				type = "header",
-				name = MyPluginName,
-			},
-			description1 = {
-				order = 2,
-				type = "description",
-				name = format("%s is a layout for ElvUI.", MyPluginName),
-			},
-			spacer1 = {
-				order = 3,
-				type = "description",
-				name = "\n\n\n",
-			},
-			header2 = {
-				order = 4,
-				type = "header",
-				name = "Installation",
-			},
-			description2 = {
-				order = 5,
-				type = "description",
-				name = "The installation guide should pop up automatically after you have completed the ElvUI installation. If you wish to re-run the installation process for this layout then please click the button below.",
-			},
-			spacer2 = {
-				order = 6,
-				type = "description",
-				name = "",
-			},
-			install = {
-				order = 7,
-				type = "execute",
-				name = "Install",
-				desc = "Run the installation process.",
-				func = function() E:GetModule("PluginInstaller"):Queue(InstallerData); E:ToggleOptions(); end,
-			},
-		},
-	}
+    E.Options.args[MyPluginName] = {
+        order = 100,
+        type = "group",
+        name = format("|cff4beb2c%s|r", MyPluginName),
+        args = {
+            header1 = {
+                order = 1,
+                type = "header",
+                name = MyPluginName,
+            },
+            description1 = {
+                order = 2,
+                type = "description",
+                name = format("%s is a layout for ElvUI.", MyPluginName),
+            },
+            spacer1 = {
+                order = 3,
+                type = "description",
+                name = "\n\n\n",
+            },
+            header2 = {
+                order = 4,
+                type = "header",
+                name = "Installation",
+            },
+            description2 = {
+                order = 5,
+                type = "description",
+                name = "The installation guide should pop up automatically after you have completed the ElvUI installation. If you wish to re-run the installation process for this layout then please click the button below.",
+            },
+            spacer2 = {
+                order = 6,
+                type = "description",
+                name = "",
+            },
+            install = {
+                order = 7,
+                type = "execute",
+                name = "Install",
+                desc = "Run the installation process.",
+                func = function() E:GetModule("PluginInstaller"):Queue(InstallerData); E:ToggleOptions(); end,
+            },
+        },
+    }
 end
 
 -- Create a unique table for our plugin
 P[MyPluginName] = {}
 
--- This function will handle initialization of the addon
+-- This handles initialization of the addon
 function mod:Initialize()
-	-- Initiate installation process if ElvUI install is complete and our plugin install has not yet been run
-	if E.private.install_complete and E.db[MyPluginName].install_version == nil then
-		E:GetModule("PluginInstaller"):Queue(InstallerData)
-	end
+    -- Initiate installation process if ElvUI install is complete and our plugin install has not yet been run
+    if E.private.install_complete and E.db[MyPluginName].install_version == nil then
+        E:GetModule("PluginInstaller"):Queue(InstallerData)
+    end
 
-	-- Insert our options table when ElvUI config is loaded
-	EP:RegisterPlugin(addon, InsertOptions)
+    -- Insert our options table when ElvUI config is loaded
+    InsertOptions()
+    EP:RegisterPlugin(addon, InsertOptions)
 end
 
 -- Register module with callback so it gets initialized when ready

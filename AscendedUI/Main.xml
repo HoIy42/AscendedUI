@@ -1,5 +1,4 @@
 <Ui>
 	<Include file='Code.lua'/>
 	<Include file='QuestTrackerToggle.lua'/>
-	<Include file='Settings.lua'/>
 </Ui>
