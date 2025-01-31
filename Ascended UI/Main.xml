@@ -1,0 +1,4 @@
+<Ui>
+	<Include file='Core\Code.lua'/>
+	<Include file='Core\Install.lua'/>
+</Ui>
