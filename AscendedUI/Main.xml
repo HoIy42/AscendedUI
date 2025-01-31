@@ -1,5 +1,5 @@
 <Ui>
 	<Include file='Code.lua'/>
-	<Include file='HideElvUIPetFrame.lua'/>
+	<Include file='Profiles/Details.lua'/>
 </Ui>
 
