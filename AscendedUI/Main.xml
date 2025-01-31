@@ -1,4 +1,5 @@
 <Ui>
 	<Include file='Code.lua'/>
-	<Include file='QuestTrackerToggle.lua'/>
+	<Include file='HideElvUIPetFrame.lua'/>
 </Ui>
+
