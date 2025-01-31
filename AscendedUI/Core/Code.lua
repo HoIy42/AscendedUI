@@ -671,7 +671,7 @@ end
 -- This is the data we pass on to the ElvUI Plugin Installer.
 -- The Plugin Installer is reponsible for displaying the install guide for this layout.
 local InstallerData = {
-	Title = format("|cff4beb2c%s %s|r", Ascended UI, "Installation"),
+	Title = format("|cff4beb2c%s %s|r", "Ascended UI", "Installation"),
 	Name = MyPluginName,
 	-- Uncomment the line below f you have a logo you want to use, otherwise it uses the one from ElvUI
 	-- tutorialImage = "Interface\\AddOns\\MyAddOn\\logo.tga",
@@ -690,7 +690,8 @@ local InstallerData = {
 			PluginInstallFrame.Desc2:SetText("Importance: |cff07D400High|r")
 			PluginInstallFrame.Option1:Show()
 			PluginInstallFrame.Option1:SetScript("OnClick", function() SetupLayout("tank") end)
-			PluginInstallFrame.Option1:SetText("Tank")
+			PluginInstallFrame.Option1:SetText("AscendedUI Basic")
+		end,
 		[3] = function()
 			PluginInstallFrame.SubTitle:SetText("Installation Complete")
 			PluginInstallFrame.Desc1:SetText("You have completed the installation process.")
