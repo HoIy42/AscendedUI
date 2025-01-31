@@ -4,6 +4,8 @@
 ## Title: |cff1784d1ElvUI|r |cff4beb2cLayout Installer|r
 ## Notes: Ascended UI A better Minimalistic solution.
 ## RequiredDeps: ElvUI
+## OptionalDeps: Ace3
+## SavedVariables: QuestTrackerDB
 ## DefaultState: enabled
 
 Main.xml

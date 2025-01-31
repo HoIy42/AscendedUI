@@ -675,6 +675,8 @@ local InstallerData = {
 	Name = MyPluginName,
 	-- Uncomment the line below f you have a logo you want to use, otherwise it uses the one from ElvUI
 	tutorialImage = "Interface\\AddOns\\AscendedUI\\logo.png",
+	tutorialImageSize = {158, 128},
+	tutorialImagePoint = {0, 17},
 	Pages = {
 		[1] = function()
 			PluginInstallFrame.SubTitle:SetFormattedText("Welcome to the installation for %s.", MyPluginName)
