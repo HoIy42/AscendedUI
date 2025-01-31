@@ -25,6 +25,7 @@ local mod = E:NewModule(MyPluginName, "AceHook-3.0", "AceEvent-3.0", "AceTimer-3
 local function SetupLayout(layout)
 
 	-- PUT YOUR EXPORTED PROFILE/SETTINGS BELOW HERE
+	-- Profile settings below
 	E.db["WT"]["combat"]["raidMarkers"]["enable"] = false
 E.db["WT"]["item"]["extraItemsBar"]["bar1"]["bindFont"]["name"] = "Beep-Black"
 E.db["WT"]["item"]["extraItemsBar"]["bar1"]["bindFont"]["style"] = "SHADOWOUTLINE"
@@ -456,7 +457,7 @@ E.db["movers"]["BNETMover"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,109,157"
 E.db["movers"]["BelowMinimapContainerMover"] = "TOPRIGHT,UIParent,TOPRIGHT,-4,-152"
 E.db["movers"]["BossBannerMover"] = "TOP,UIParent,TOP,0,-142"
 E.db["movers"]["BossButton"] = "BOTTOM,UIParent,BOTTOM,130,437"
-E.db["movers"]["BossHeaderMover"] = "TOP,UIParent,TOP,276,-300"
+E.db["movers"]["BossHeaderMover"] = "TOP,UIParent,TOP,276,-306"
 E.db["movers"]["BuffsMover"] = "TOPRIGHT,UIParent,TOPRIGHT,-155,-4"
 E.db["movers"]["CM_MOVER"] = "BOTTOM,ElvUIParent,BOTTOM,0,150"
 E.db["movers"]["ClassBarMover"] = "BOTTOM,ElvUIParent,BOTTOM,0,329"
@@ -764,6 +765,7 @@ E.db["unitframe"]["units"]["boss"]["debuffs"]["enable"] = false
 E.db["unitframe"]["units"]["boss"]["debuffs"]["sizeOverride"] = 35
 E.db["unitframe"]["units"]["boss"]["debuffs"]["xOffset"] = 3
 E.db["unitframe"]["units"]["boss"]["debuffs"]["yOffset"] = 0
+E.db["unitframe"]["units"]["boss"]["enable"] = false
 E.db["unitframe"]["units"]["boss"]["growthDirection"] = "UP"
 E.db["unitframe"]["units"]["boss"]["health"]["position"] = "TOPRIGHT"
 E.db["unitframe"]["units"]["boss"]["health"]["text_format"] = "[perhp]%"
@@ -1206,13 +1208,13 @@ E.db["unitframe"]["units"]["targettargettarget"]["buffs"]["countFontOutline"] = 
 E.db["unitframe"]["units"]["targettargettarget"]["debuffs"]["countFont"] = "Beep-Black"
 E.db["unitframe"]["units"]["targettargettarget"]["debuffs"]["countFontOutline"] = "SHADOWOUTLINE"
 E.db["unitframe"]["units"]["targettargettarget"]["power"]["height"] = 3
--- gloable account settings below
+-- Gloable account settings below
 E.global["datatexts"]["customPanels"]["Info Panel"]["fonts"]["font"] = "Beep-Black"
 E.global["datatexts"]["customPanels"]["Info Panel"]["fonts"]["fontOutline"] = "SHADOWOUTLINE"
 E.global["datatexts"]["customPanels"]["Info Panel"]["name"] = "Info Panel"
 E.global["datatexts"]["settings"]["System"]["ShowOthers"] = false
 E.global["datatexts"]["settings"]["System"]["latency"] = "HOME"
--- private account settings below
+-- Private account settings below
 E.private["install_complete"] = 13.81
 E.private["nameplates"]["enable"] = false
 E.private["skins"]["parchmentRemoverEnable"] = true
@@ -1277,6 +1279,14 @@ local InstallerData = {
 			PluginInstallFrame.Option1:SetText("AscendedUI")
 		end,
 		[3] = function()
+			PluginInstallFrame.SubTitle:SetText(L["Details profile"])
+			PluginInstallFrame.Desc1:SetText(L["Please click the button below to apply Luckyones profile for Details! Damage Meter."])
+			PluginInstallFrame.Desc2:SetText(format('|cff4beb2c%s', L["Recommended step. Should not be skipped."]))
+			PluginInstallFrame.Option1:Show()
+			PluginInstallFrame.Option1:SetScript('OnClick', function() Private:Setup_Details(true) end)
+			PluginInstallFrame.Option1:SetText(L["Setup Details"])
+		end,
+		[4] = function()
 			PluginInstallFrame.SubTitle:SetText("Installation Complete")
 			PluginInstallFrame.Desc1:SetText("You have completed the installation process.")
 			PluginInstallFrame.Desc2:SetText("Please click the button below in order to finalize the process and automatically reload your UI.")
@@ -1288,7 +1298,9 @@ local InstallerData = {
 	StepTitles = {
 		[1] = "Welcome",
 		[2] = "Layouts",
-		[3] = "Installation Complete",
+		[3] = 'Details',
+		[4] = "Installation Complete",
+		
 	},
 	StepTitlesColor = {1, 1, 1},
 	StepTitlesColorSelected = {0, 179/255, 1},
