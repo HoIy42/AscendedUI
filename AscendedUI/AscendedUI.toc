@@ -1,11 +1,9 @@
-## Interface: 100207
+## Interface: 110007
 ## Author: Holy
 ## Version: 1.00
 ## Title: |cff1784d1ElvUI|r |cff4beb2cAscendedUI|r
 ## Notes: Ascended UI A better Minimalistic solution.
-## RequiredDeps: ElvUI, ElvUI_mMediaTag
-## OptionalDeps: Ace3
-## SavedVariables: QuestTrackerDB
+## RequiredDeps: ElvUI, ElvUI_mMediaTag, ElvUI_WindTools
 ## DefaultState: enabled
 
 Main.xml
