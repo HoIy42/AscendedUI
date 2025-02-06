@@ -53,6 +53,9 @@ local function SetupLayout(layout)
 
 	--end of creating the custom texts for unitframes
 
+	--movers needs to create the table if it doesnt exist
+	if not E.db.movers then E.db.movers = {} end
+
 	-- PUT YOUR EXPORTED PROFILE/SETTINGS BELOW HERE
 	-- Profile settings below
 	E.db["WT"]["combat"]["raidMarkers"]["enable"] = false
