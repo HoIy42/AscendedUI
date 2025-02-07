@@ -1358,7 +1358,13 @@ local InstallerData = {
 			PluginInstallFrame.Desc1:SetText("These are the layouts that are available. Please click a button below to apply the layout of your choosing.")
 			PluginInstallFrame.Desc2:SetText("Importance: |cff07D400High|r")
 			PluginInstallFrame.Option1:Show()
-			PluginInstallFrame.Option1:SetScript("OnClick", function() SetupLayout("tank") end)
+			PluginInstallFrame.Option1:SetScript("OnClick", function()
+				--here we create a new profile, so that your installer doesn't override the current profile and they can keep the old profile around
+				E.data:SetProfile('AscendedUI')
+
+				--call the layout function
+				SetupLayout()
+			end)
 			PluginInstallFrame.Option1:SetText("AscendedUI")
 		end,
 		[3] = function()
